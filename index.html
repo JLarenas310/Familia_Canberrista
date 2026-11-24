@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Familia Canberrista</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Oswald:wght@500&display=swap">
+<style>
+/* VOICE: solemne, cálido, de reunión de viejos camaradas
+   IDEA: un programa de ceremonia de la FAP que cobra vida al tocarlo
+   PICTURE: el Canberra azul, grande, a sangre en la portada
+   COLOUR and TYPE: azul nocturno del avión, rojo y blanco del Perú; Cinzel + EB Garamond
+   LAYOUT: portada a pantalla completa → letra en una columna que se ilumina estrofa por estrofa */
+:root{color-scheme:dark;--bg:#081428;--panel:#0E2140;--ink:#F4F1EA;--dim:#8D9AB2;--red:#D91023;--line:#22385E}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 'EB Garamond',Georgia,serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,.st:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.flag{display:flex;height:6px}.flag i{flex:1;background:var(--red)}.flag i:nth-child(2){background:#fff}
+
+/* Portada */
+#cover{min-height:100svh;display:flex;flex-direction:column}
+.hero{position:relative;flex:1 1 auto;min-height:46svh;background:url(canberra.jpg) 38% 50%/cover no-repeat}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,20,40,0) 45%,var(--bg) 100%)}
+.ctext{padding:8px max(6vw,20px) max(40px,env(safe-area-inset-bottom));text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
+.kick{font:500 14px/1.3 Oswald,sans-serif;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;margin:0}
+h1{font:900 clamp(38px,10vw,64px)/1.04 Cinzel,serif;margin:0;text-wrap:balance}
+.lema{display:flex;align-items:center;gap:12px;font:500 16px Oswald,sans-serif;letter-spacing:.12em;color:#fff;margin:0}
+.lema .flag{width:44px;height:4px}
+.play{margin-top:14px;display:inline-flex;align-items:center;gap:12px;background:var(--red);border:0;border-radius:999px;padding:16px 34px;font:500 20px Oswald,sans-serif;letter-spacing:.06em;box-shadow:0 10px 30px rgba(217,16,35,.35)}
+.play svg{width:22px;height:22px}
+.credit{font-size:15px;color:var(--dim);margin:6px 0 0}
+
+/* Reproductor */
+#player{display:none}
+.bar{position:sticky;top:0;z-index:5;background:rgba(8,20,40,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.barin{max-width:720px;margin:0 auto;padding:10px 16px 12px;display:grid;grid-template-columns:56px minmax(0,1fr) 52px;gap:12px;align-items:center}
+.thumb{width:56px;height:56px;border-radius:8px;background:url(canberra.jpg) 30% 50%/cover}
+.bt{font:700 17px/1.2 Cinzel,serif;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bs{font-size:14px;color:var(--dim);margin:0}
+.pp{width:52px;height:52px;border-radius:50%;border:0;background:var(--red);display:grid;place-items:center}
+.pp svg{width:22px;height:22px}
+.prog{grid-column:1/-1;display:flex;align-items:center;gap:10px;font:500 13px Oswald,sans-serif;color:var(--dim);font-variant-numeric:tabular-nums}
+.track{flex:1;height:22px;display:flex;align-items:center;cursor:pointer}
+.track div{height:4px;width:100%;background:var(--line);border-radius:2px;overflow:hidden}
+.track span{display:block;height:100%;width:0;background:#fff}
+.lyrics{max-width:640px;margin:0 auto;padding:28vh 22px 40vh;display:flex;flex-direction:column;gap:22px}
+.st{margin:0;padding:10px 14px;border-radius:10px;font-size:21px;line-height:1.45;color:#56657F;transition:color .35s,transform .35s,background .35s;transform-origin:left center;cursor:pointer}
+.st.ch{font-weight:600}
+.st.cry{font:500 18px/1.6 Oswald,sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.st.past{color:#7E8BA3}
+.st.on{color:#fff;background:var(--panel);transform:scale(1.03)}
+.st.cry.on{color:#fff;background:var(--red)}
+.end{max-width:640px;margin:-30vh auto 0;padding:0 22px 60px;text-align:center;color:var(--dim);font-size:15px}
+.end b{display:block;font:700 22px Cinzel,serif;color:var(--ink);margin-bottom:6px}
+
+/* Modo ajuste (#ajustar) */
+#adj{display:none;position:fixed;left:0;right:0;bottom:0;z-index:9;background:#111c30;border-top:2px solid var(--red);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+#adj .row{max-width:720px;margin:0 auto;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+#adj button{border:0;border-radius:10px;padding:12px 16px;background:#fff;color:#081428;font:500 16px Oswald,sans-serif}
+#adj #mark{background:var(--red);color:#fff;flex:1 1 220px;min-height:52px}
+#adj textarea{width:100%;max-width:720px;display:block;margin:10px auto 0;height:70px;background:#081428;color:#fff;border:1px solid var(--line);border-radius:8px;font:14px monospace;padding:8px}
+@media (prefers-reduced-motion:reduce){.st{transition:none}.st.on{transform:none}}
+</style>
+</head>
+<body>
+
+<section id="cover">
+  <div class="hero" role="img" aria-label="English Electric Canberra de la Fuerza Aérea del Perú"></div>
+  <div class="ctext">
+    <p class="kick">Vals criollo · Grupo Soy del Perú</p>
+    <h1>Familia Canberrista</h1>
+    <p class="lema"><span class="flag"><i></i><i></i><i></i></span>FUERZA, PODER Y GLORIA<span class="flag"><i></i><i></i><i></i></span></p>
+    <button class="play" id="start"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4.5v15l13-7.5z"/></svg>Escuchar y cantar</button>
+    <p class="credit">Letra y música: José Luis Arenas, usando IA</p>
+  </div>
+  <div class="flag"><i></i><i></i><i></i></div>
+</section>
+
+<section id="player">
+  <div class="bar"><div class="barin">
+    <div class="thumb" aria-hidden="true"></div>
+    <div><p class="bt">Familia Canberrista</p><p class="bs">Grupo Soy del Perú</p></div>
+    <button class="pp" id="pp" aria-label="Pausar"></button>
+    <div class="prog"><span id="cur">0:00</span><div class="track" id="track" role="slider" aria-label="Posición de la canción" tabindex="0"><div><span id="fill"></span></div></div><span id="dur">4:12</span></div>
+  </div></div>
+  <div class="lyrics" id="lyrics"></div>
+  <div class="end"><b>¡Viva la Familia Canberrista!</b>Grupo Aéreo N.° 9 · Pisco<br>Letra y música: José Luis Arenas, usando IA</div>
+</section>
+
+<div id="adj"><div class="row">
+  <button id="mark">Marcar estrofa 1</button>
+  <button id="undo">Deshacer</button>
+  <button id="copy">Copiar tiempos</button>
+</div><textarea id="out" readonly aria-label="Tiempos marcados"></textarea></div>
+
+<audio id="au" src="Familia_Canberrista.mp3" preload="metadata"></audio>
+
+<script>
+{
+// Cada estrofa: [segundo de inicio, tipo, líneas]   tipo: v = verso, c = coro, f = lema/grito
+const S=[
+ [21.2,'v',['En los años cincuenta,','desde la lejana Inglaterra,','un gigante de la aviación llegó:','era el poderoso Canberra.']],
+ [31.9,'v',['En Limatambo comenzó','con el Escuadrón Veintidós,','y en los años setenta, en Pisco,','el Grupo Nueve se formó.','¡Fuerza, poder y gloria!']],
+ [53.0,'v',['Desde Pisco levantó sus alas,','Grupo Nueve, orgullo inmortal,','con sus pilotos y navegantes,','con su entrega profesional.']],
+ [66.0,'v',['Y detrás de cada vuelo','hubo manos de gran valor:','mecánicos y especialistas','que pusieron el corazón.']],
+ [77.0,'v',['Apoyados por nuestras familias','y amigos de verdad,','con el cariño de la ciudad de Pisco,','que nos dio su lealtad.']],
+ [86.2,'v',['No solamente era volar:','era un equipo de hermanos','que aprendieron a luchar.','¡Fuerza, poder y gloria!']],
+ [98.2,'c',['¡Canberristas de mi Perú!','¡Hombres de honor y de virtud!','Aunque los años pasen volando,','nunca se apaga nuestra juventud.']],
+ [108.7,'c',['¡Canberristas de corazón!','Siempre unidos en la misión,','los que volaron, los que quedaron','y los que al cielo se adelantaron.']],
+ [121.1,'f',['¡Fuerza, poder y gloria!','¡Hasta la victoria, hermanos!']],
+ [129.5,'v',['Hay nombres que guarda el viento,','hay recuerdos que duelen más:','compañeros que en pleno vuelo','no regresaron jamás.']],
+ [140.1,'v',['Pero viven en nuestra memoria,','porque un hombre que sirve a su patria','nunca muere en el corazón.']],
+ [153.5,'f',['¡Fuerza, poder y gloria!']],
+ [162.1,'v',['Hoy los años pintan de plata','aquellos rostros de ayer,','pero sigue encendida en el alma','la hermandad que nos vio crecer.']],
+ [176.0,'v',['Que se encuentren los viejos amigos','y que se abracen una vez más;','brindemos con un JP4:','¡SALUD, CANBERRISTAS HASTA EL FINAL!']],
+ [183.2,'c',['¡Canberristas de mi Perú!','¡Hombres de honor y de virtud!','Desde Pisco hasta el infinito,','nuestra historia no morirá.']],
+ [193.4,'c',['¡Glorioso Grupo Aéreo Número Nueve,','familia unida por la eternidad!','Los que volaron siguen presentes,','¡nadie los podrá olvidar!']],
+ [206.4,'v',['Y si algún día preguntan','quiénes fuimos y qué dejamos,','digan que fuimos hermanos,','que por el Perú volamos.']],
+ [225.0,'f',['¡Fuerza, poder y gloria!','¡Hasta la victoria, hermanos!','¡Viva la Familia Canberrista!']]
+];
+const $=id=>document.getElementById(id);
+const au=$('au'),L=$('lyrics');
+const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+L.innerHTML=S.map((s,i)=>`<p class="st ${s[1]==='c'?'ch':s[1]==='f'?'cry':''}" data-i="${i}" tabindex="0">${s[2].map(esc).join('<br>')}</p>`).join('');
+const els=[...L.children];
+const PLAY='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M7 4.5v15l13-7.5z"/></svg>';
+const PAUSE='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
+const fmt=t=>{t=Math.max(0,t|0);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
+let cur=-1;
+function setPP(){const p=au.paused;$('pp').innerHTML=p?PLAY:PAUSE;$('pp').setAttribute('aria-label',p?'Reproducir':'Pausar')}
+function play(){const r=au.play();if(r&&r.catch)r.catch(()=>{});}
+function show(i,scroll){
+  if(i===cur)return;cur=i;
+  els.forEach((e,k)=>{e.classList.toggle('on',k===i);e.classList.toggle('past',k<i)});
+  if(scroll&&i>=0)els[i].scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});
+}
+function tick(){
+  const t=au.currentTime,d=au.duration||252;
+  $('cur').textContent=fmt(t);$('fill').style.width=(t/d*100)+'%';
+  let i=-1;for(let k=0;k<S.length;k++)if(t>=S[k][0])i=k;
+  show(i,true);
+}
+$('start').addEventListener('click',()=>{
+  $('cover').style.display='none';$('player').style.display='block';window.scrollTo(0,0);play();
+});
+$('pp').addEventListener('click',()=>{au.paused?play():au.pause()});
+au.addEventListener('play',setPP);au.addEventListener('pause',setPP);
+au.addEventListener('timeupdate',tick);
+au.addEventListener('loadedmetadata',()=>{$('dur').textContent=fmt(au.duration)});
+au.addEventListener('ended',()=>{show(-1,false);window.scrollTo({top:0,behavior:'smooth'})});
+function seekX(x){const r=$('track').getBoundingClientRect();const d=au.duration||252;au.currentTime=Math.min(Math.max((x-r.left)/r.width,0),1)*d}
+$('track').addEventListener('click',e=>seekX(e.clientX));
+$('track').addEventListener('keydown',e=>{if(e.key==='ArrowRight')au.currentTime+=5;if(e.key==='ArrowLeft')au.currentTime-=5});
+els.forEach((e,i)=>{const go=()=>{au.currentTime=S[i][0]+0.05;if(au.paused)play()};e.addEventListener('click',go);e.addEventListener('keydown',ev=>{if(ev.key==='Enter')go()})});
+setPP();
+
+// Modo ajuste: abrir el enlace con #ajustar, tocar "Marcar" cuando empieza cada estrofa
+if(location.hash==='#ajustar'){
+  $('adj').style.display='block';const marks=[];
+  const upd=()=>{$('mark').textContent=marks.length<S.length?'Marcar estrofa '+(marks.length+1):'¡Listo! Copie los tiempos';$('out').value=marks.map(m=>m.toFixed(1)).join(', ')};
+  $('mark').addEventListener('click',()=>{if($('player').style.display!=='block'){$('start').click()}if(marks.length<S.length){marks.push(au.currentTime);S[marks.length-1][0]=au.currentTime}upd()});
+  $('undo').addEventListener('click',()=>{marks.pop();upd()});
+  $('copy').addEventListener('click',()=>{try{navigator.clipboard.writeText($('out').value).then(()=>{$('copy').textContent='Copiado'},()=>{$('out').select()})}catch(e){$('out').select()}});
+  upd();
+}
+}
+</script>
+</body>
+</html>
